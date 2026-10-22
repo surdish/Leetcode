@@ -1,0 +1,30 @@
+class Solution {
+    public int minOperations(int[] nums) {
+        int n = nums.length;
+        int best = Integer.MAX_VALUE;
+
+        // Case 1: nums is a rotation of the ascending order [0..n-1]
+        int p = nums[0];
+        boolean asc = true;
+        for (int i = 0; i < n; i++) {
+            if (nums[i] != (i + p) % n) { asc = false; break; }
+        }
+        if (asc) {
+            if (p == 0) best = 0;
+            else best = Math.min(n - p, p + 2); // rotate left (n-p) times, or reverse + rotate + reverse
+        }
+
+        // Case 2: nums is a rotation of the descending order [n-1..0]
+        int c = nums[0];
+        boolean desc = true;
+        for (int i = 0; i < n; i++) {
+            if (nums[i] != (((c - i) % n) + n) % n) { desc = false; break; }
+        }
+        if (desc) {
+            int q = (c + 1) % n;
+            best = Math.min(best, Math.min(q + 1, n - q + 1));
+        }
+
+        return best == Integer.MAX_VALUE ? -1 : best;
+    }
+}
