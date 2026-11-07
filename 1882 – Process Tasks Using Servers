@@ -1,0 +1,72 @@
+import java.util.*;
+
+class Solution {
+    public int[] assignTasks(int[] servers, int[] tasks) {
+
+        int n = servers.length;
+        int m = tasks.length;
+
+        int[] ans = new int[m];
+
+        // Free servers: sort by weight, then index
+        PriorityQueue<Integer> free = new PriorityQueue<>(
+            (a, b) -> {
+                if (servers[a] != servers[b]) {
+                    return servers[a] - servers[b];
+                }
+                return a - b;
+            }
+        );
+
+        // Busy servers: sort by finish time,
+        // then weight, then index
+        PriorityQueue<int[]> busy = new PriorityQueue<>(
+            (a, b) -> {
+                if (a[0] != b[0]) {
+                    return Integer.compare(a[0], b[0]);
+                }
+                if (servers[a[1]] != servers[b[1]]) {
+                    return servers[a[1]] - servers[b[1]];
+                }
+                return a[1] - b[1];
+            }
+        );
+
+        // Initially, all servers are free
+        for (int i = 0; i < n; i++) {
+            free.offer(i);
+        }
+
+        for (int i = 0; i < m; i++) {
+
+            // Release servers that have completed their tasks
+            while (!busy.isEmpty() && busy.peek()[0] <= i) {
+                int[] completed = busy.poll();
+                free.offer(completed[1]);
+            }
+
+            // If no server is free, wait for the earliest one
+            if (free.isEmpty()) {
+
+                int time = busy.peek()[0];
+
+                while (!busy.isEmpty() && busy.peek()[0] <= time) {
+                    int[] completed = busy.poll();
+                    free.offer(completed[1]);
+                }
+            }
+
+            // Select the best available server
+            int server = free.poll();
+
+            ans[i] = server;
+
+            // Calculate when this server becomes free
+            int finishTime = Math.max(i, 0) + tasks[i];
+
+            busy.offer(new int[]{finishTime, server});
+        }
+
+        return ans;
+    }
+}
