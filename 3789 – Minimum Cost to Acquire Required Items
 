@@ -1,0 +1,23 @@
+
+class Solution {
+    public long minimumCost(int cost1, int cost2, int costBoth,
+                            int need1, int need2) {
+
+        long common = Math.min(need1, need2);
+        long extra1 = need1 - common;
+        long extra2 = need2 - common;
+
+        // Cheapest way to satisfy both requirements
+        long commonCost = common *
+                Math.min((long) costBoth, (long) cost1 + cost2);
+
+        // Cheapest way to satisfy remaining requirements
+        long remaining1 = extra1 *
+                Math.min(cost1, costBoth);
+
+        long remaining2 = extra2 *
+                Math.min(cost2, costBoth);
+
+        return commonCost + remaining1 + remaining2;
+    }
+}
